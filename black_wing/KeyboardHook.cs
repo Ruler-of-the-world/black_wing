@@ -238,7 +238,7 @@ namespace black_wing
                     }
                 }
 
-                if (KeyInNumber != -1)
+                if (KeyInNumber != -1 && Key1 == ReadCSV.getInKey1()[KeyInNumber])
                 {
                     return (System.IntPtr)1;
                 }
