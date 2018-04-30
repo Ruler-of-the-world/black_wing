@@ -124,8 +124,8 @@ namespace black_wing
         /// </summary>
         private static System.IntPtr Handle;
 
-        // 無変換のフラグ
-        public static byte Flag;
+        // フラグ
+        private static uint Key1 = 0;
 
         // 登録イベントのリストを取得、設定します。
         private static System.Collections.Generic.List<HookHandler> Events;
@@ -211,39 +211,37 @@ namespace black_wing
                 //登録してあるイベントを発生させます
                 HookEvent(ref State);
 
-                if (s.vkCode == 0x1D && GetStroke(msg) == Stroke.KEY_DOWN)
+                if (Array.IndexOf(ReadCSV.getInKey1Dis(), s.vkCode) != -1 && GetStroke(msg) == Stroke.KEY_DOWN)
                 {
-                    Flag = 1;
+                    Key1 = s.vkCode;
                     return (System.IntPtr)1;
                 }
 
-                if (s.vkCode == 0x1D && GetStroke(msg) == Stroke.KEY_UP)
+                if (Key1 == s.vkCode && GetStroke(msg) == Stroke.KEY_UP)
                 {
-                    Flag = 0;
+                    Key1 = 0;
+                    return (System.IntPtr)1;
                 }
 
-                uint[] KeysN = { 0x46, 0x48, 0x4A, 0x4B, 0x4C, 0x4D, 0x47, 0xBB, 0x1C };
-                byte KeyInNu = 0;
-                uint w = s.vkCode;
-
-                for (int i = 0; i < KeysN.Length; i++)
+                int KeyInNumber = Array.IndexOf(ReadCSV.getInKey2(), s.vkCode);
+                while (0 <= KeyInNumber && Key1 != ReadCSV.getInKey1()[KeyInNumber])
                 {
-                    if (s.vkCode == KeysN[i])
+                    if (KeyInNumber + 1 < ReadCSV.getInKey2().Length)
                     {
-                        KeyInNu = 1;
+                        //次の要素を検索する
+                        KeyInNumber = Array.IndexOf(ReadCSV.getInKey2(), s.vkCode, KeyInNumber + 1);
+                    }
+                    else
+                    {
+                        //最後まで検索したときはループを抜ける
+                        break;
                     }
                 }
 
-                if (KeyInNu == 1 && Flag == 1)
+                if (KeyInNumber != -1)
                 {
                     return (System.IntPtr)1;
                 }
-
-                if (s.vkCode == 0x1C || s.vkCode == 0xF2)
-                {
-                    return (System.IntPtr)1;
-                }
-
             }
 
             return NativeMethods.CallNextHookEx(Handle, nCode, msg, ref s);

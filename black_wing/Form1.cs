@@ -75,41 +75,52 @@ namespace black_wing
 
 
         //フラグ管理のための変数
-        byte Flag2;
-        Keys[] SearchKeys = { Keys.F, Keys.H, Keys.J, Keys.K, Keys.L, Keys.M, Keys.G, Keys.Oemplus, Keys.IMEConvert };
-        Keys[] OutKeys = { Keys.Back, Keys.Left, Keys.Down, Keys.Up, Keys.Right, Keys.Enter, Keys.Delete, Keys.KanjiMode, Keys.Escape };
+        private uint Key1 = 0;
 
+         [STAThread]
         void hookKeyboardTest(ref KeyboardHook.StateKeyboard s)
         {
-            short OutKey = 0;
-
-            Keys w = s.Key;
-            uint sf = s.ScanCode;
+            uint InputKey = (uint)s.Key;
 
             //無変換をフラグ管理する
-            if (s.Key == Keys.IMENonconvert && s.Stroke == KeyboardHook.Stroke.KEY_DOWN)
+            if (Array.IndexOf(ReadCSV.getInKey1Dis(), InputKey) != -1 && s.Stroke == KeyboardHook.Stroke.KEY_DOWN)
             {
-                Flag2 = 1;
+                Key1 = InputKey;
             }
 
-            if (s.Key == Keys.IMENonconvert && s.Stroke == KeyboardHook.Stroke.KEY_UP)
+            if (InputKey == Key1 && s.Stroke == KeyboardHook.Stroke.KEY_UP)
             {
-                Flag2 = 0;
+                Key1 = 0;
             }
 
-            int KeyNu = Array.IndexOf(SearchKeys, s.Key);
-
-            if (KeyNu != -1)
+            int KeyNumber = Array.IndexOf(ReadCSV.getInKey2(), InputKey);
+            while (0 <= KeyNumber && Key1 != ReadCSV.getInKey1()[KeyNumber])
             {
-                OutKey = (short)OutKeys[KeyNu];
+                if (KeyNumber + 1 < ReadCSV.getInKey2().Length)
+                {
+                    //次の要素を検索する
+                    KeyNumber = Array.IndexOf(ReadCSV.getInKey2(), InputKey, KeyNumber + 1);
+                }
+                else
+                {
+                    //最後まで検索したときはループを抜ける
+                    break;
+                }
+            }
+
+            if(KeyNumber != -1 && ReadCSV.getOutKey()[KeyNumber] >= 1000)
+            {
+                string CBstring = ReadCSV.getOutString()[ReadCSV.getOutKey()[KeyNumber] - 1000];
+                Clipboard.SetText(CBstring);
             }
 
             //無変換＋Ｆ＝BackSpace
-            if (OutKey != 0 && s.Stroke == KeyboardHook.Stroke.KEY_DOWN && Flag2 == 1)
+            if (KeyNumber != -1 && s.Stroke == KeyboardHook.Stroke.KEY_DOWN)
             {
                 // キーボード操作実行用のデータ
                 const int num = 2;
                 INPUT[] inp = new INPUT[num];
+                short OutKey = (short)ReadCSV.getOutKey()[KeyNumber];
 
                 // (0)キーボードを押す
                 inp[0].type = INPUT_KEYBOARD;
@@ -136,6 +147,7 @@ namespace black_wing
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            ReadCSV.CsvToArray();
             KeyboardHook.AddEvent(hookKeyboardTest); // hookKeyboardTestをイベントに追加
             KeyboardHook.Start();
         }
