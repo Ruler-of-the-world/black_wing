@@ -7,3 +7,4 @@ C:\Users\fukus\Documents\Skill_of_ruler\black_wing\black_wing\bin\Debug\black_wi
 C:\Users\fukus\Documents\Skill_of_ruler\black_wing\black_wing\obj\Debug\black_wing.exe
 C:\Users\fukus\Documents\Skill_of_ruler\black_wing\black_wing\obj\Debug\black_wing.pdb
 C:\Users\fukus\Documents\Skill_of_ruler\black_wing\black_wing\obj\Debug\black_wing.csproj.CoreCompileInputs.cache
+C:\Users\fukus\Documents\Skill_of_ruler\black_wing\black_wing\obj\Debug\black_wing.csprojResolveAssemblyReference.cache

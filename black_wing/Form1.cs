@@ -6,7 +6,7 @@ namespace black_wing
 {
     public partial class Form1 : Form
     {
-        public Form1()
+       public Form1()
         {
             InitializeComponent();
         }
@@ -88,15 +88,18 @@ namespace black_wing
                 Key1 = InputKey;
             }
 
-            if (InputKey == Key1 && s.Stroke == KeyboardHook.Stroke.KEY_UP)
+            if (s.Stroke != KeyboardHook.Stroke.KEY_DOWN)
             {
-                Key1 = 0;
+                if (InputKey == Key1 && s.Stroke == KeyboardHook.Stroke.KEY_UP)
+                {
+                    Key1 = 0;
+                }
             }
 
             int KeyNumber = Array.IndexOf(ReadCSV.getInKey2(), InputKey);
             while (0 <= KeyNumber && Key1 != ReadCSV.getInKey1()[KeyNumber])
             {
-                if (KeyNumber + 1 < ReadCSV.getInKey2().Length)
+                if (KeyNumber + 1 <= ReadCSV.getInKey2().Length)
                 {
                     //次の要素を検索する
                     KeyNumber = Array.IndexOf(ReadCSV.getInKey2(), InputKey, KeyNumber + 1);
